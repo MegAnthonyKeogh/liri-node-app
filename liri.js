@@ -8,25 +8,36 @@ var client = new Twitter(keys.twitter);
 var request = require("request");
 
 //twitter call 
-function tweets(){
- var params = 'MommyValidated';
- client.get('search/tweets', {q: params}, function(error, tweets, response) {
-     if (error){
-         return console.log(error)
-     }
-      if (!error) {
-        for (var i = 0; i < 20; i++){
-           console.log("tweet created at " + tweets.statuses[i].created_at);
-           console.log("tweet said " + tweets.statuses[i].text)
-       //console.log(tweets);
-      }
-    }
-});
+function tweets() {
+    var params = 'MommyValidated';
+    client.get('search/tweets', {
+        q: params
+    }, function (error, tweets, response) {
+        if (error) {
+            return console.log(error)
+        }
+        if (!error) {
+            for (var i = 0; i < 20; i++) {
+                console.log("tweet created at " + tweets.statuses[i].created_at);
+                console.log("tweet said " + tweets.statuses[i].text)
+                //console.log(tweets);
+            }
+        }
+    });
 }
 //spotify call
-function playSong() {
-    var songName = "";
+function playSong(song) {
+    if(song){
+        var songName = song;
+    } else {
+        var songName = "";
+    }
+    console.log("SongName " + songName);
     var args = process.argv
+    // if (args.length < 4) {
+    //     songName = "Ace of Base";
+    //     console.log("ace of base");
+    // }
     for (var i = 3; i < args.length; i++) {
         songName = songName + " " + args[i];
     }
@@ -39,7 +50,7 @@ function playSong() {
         if (err) {
             return console.log('Error occurred: ' + err);
         }
-        console.log(data.tracks.items[0].artists[0].name);
+        console.log("The artist is " + data.tracks.items[0].artists[0].name);
         console.log("album name " + data.tracks.items[0].album.name);
         console.log("song name " + data.tracks.items[0].name);
         console.log("preview link " + data.tracks.items[0].preview_url);
@@ -76,18 +87,36 @@ function movieRequest() {
     });
 }
 
+function readFile() {
+    fs = require('fs')
+    fs.readFile('./random.txt', 'utf8', function (err, data) {
+        if (err) {
+            return console.log(err);
+        }
+        console.log(data.trim().split(","));
+        playSong(data.trim().split(",")[1])
+    })
+}
+
 //actual code 
 if (process.argv[2] === "my-tweets") {
     tweets();
     console.log("go to twitter");
 } else if (process.argv[2] === "spotify-this-song") {
-    playSong();
+    if(process.argv[3]){
+        playSong();
+    } else {
+        playSong('Ace of Base');
+    }
+    
     console.log("got to spotify");
 } else if (process.argv[2] === "movie-this") {
     movieRequest();
     console.log("OMDB");
 } else if (process.argv[2] === "do-what-it-says") {
+    readFile();
     console.log("just do it");
 } else {
     console.log("I don't know what you want");
 }
+
